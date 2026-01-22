@@ -104,5 +104,6 @@ def process_image(data: ImageRequest):
     return {
         "message": "Document scanned successfully",
         # ⚠️ Localhost is fine for now; we’ll change after deploy
-        "output_url": f"http://127.0.0.1:8000/{filename}"
+        "output_url": f"https://doc-scanner-backend-ku8a.onrender.com/{filename}"
+
     }
