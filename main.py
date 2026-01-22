@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# ✅ CORS FIX
+# ✅ CORS (required for frontend)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -20,7 +20,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve scanned images
+# ✅ IMPORTANT FIX: create outputs folder BEFORE mounting
+os.makedirs("outputs", exist_ok=True)
+
+# ✅ Now it is safe to mount
 app.mount("/outputs", StaticFiles(directory="outputs"), name="outputs")
 
 class ImageRequest(BaseModel):
@@ -95,11 +98,11 @@ def process_image(data: ImageRequest):
     warped = cv2.warpPerspective(orig, M, (maxWidth, maxHeight))
 
     # 5️⃣ Save output
-    os.makedirs("outputs", exist_ok=True)
     filename = f"outputs/scan_{uuid.uuid4().hex}.png"
     cv2.imwrite(filename, warped)
 
     return {
         "message": "Document scanned successfully",
+        # ⚠️ Localhost is fine for now; we’ll change after deploy
         "output_url": f"http://127.0.0.1:8000/{filename}"
     }
